@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SB Tape Group | Film Detail</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <a class="topbar-logo" href="index.html">
+    <div class="logo-mark">SB</div>
+    <div class="logo-text">
+      <span class="logo-name">SB TAPE GROUP</span>
+      <span class="logo-sub">Business Intelligence</span>
+    </div>
+  </a>
+  <nav class="topbar-nav">
+    <a class="nav-link" href="index.html">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </a>
+    <a class="nav-link active" href="film-detail.html">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      Detail
+    </a>
+    <a class="nav-link" href="upload.html">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17,8 12,3 7,8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      Upload
+    </a>
+  </nav>
+  <div class="topbar-right">
+    <div class="topbar-badge">COATING & PRINTING <span>MODULE</span></div>
+  </div>
+</header>
+
+<!-- FILTER BAR -->
+<div class="filter-bar">
+  <div class="filter-group">
+    <label class="filter-label">Bulan:</label>
+    <div class="month-buttons" id="monthFilter"></div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<main class="main-content">
+
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="page-title" id="pageTitle">Film Detail</div>
+      <div class="page-subtitle">Full batch-level data for selected month</div>
+      <div class="page-meta" id="pageMeta"></div>
+    </div>
+  </div>
+
+  <!-- FILTER CONTROLS -->
+  <div class="section-card" id="filterCard">
+    <div class="section-card-header">
+      <span class="section-card-title">Filter & Search</span>
+      <button class="btn btn-secondary" id="clearFiltersBtn" onclick="clearFilters()" style="font-size:12px;padding:6px 12px;">Clear Filters</button>
+    </div>
+    <div class="section-card-body" style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;">
+      <div>
+        <div style="font-size:12px;color:var(--gray-700);font-weight:600;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:6px;">Customer</div>
+        <select id="filterCustomer" class="filter-select" onchange="applyFilters()"></select>
+      </div>
+      <div>
+        <div style="font-size:12px;color:var(--gray-700);font-weight:600;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:6px;">Color</div>
+        <select id="filterColor" class="filter-select" onchange="applyFilters()"></select>
+      </div>
+      <div>
+        <div style="font-size:12px;color:var(--gray-700);font-weight:600;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:6px;">Micron</div>
+        <select id="filterMicron" class="filter-select" onchange="applyFilters()"></select>
+      </div>
+      <div>
+        <div style="font-size:12px;color:var(--gray-700);font-weight:600;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:6px;">Output Status</div>
+        <select id="filterOutput" class="filter-select" onchange="applyFilters()">
+          <option value="">All</option>
+          <option value="done">Done</option>
+          <option value="pending">Pending</option>
+        </select>
+      </div>
+      <div style="flex:1;min-width:200px;">
+        <div style="font-size:12px;color:var(--gray-700);font-weight:600;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:6px;">Search</div>
+        <input type="text" id="searchBox" class="filter-select" placeholder="Batch No, Production No, Item..." oninput="applyFilters()" style="width:100%;">
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS BAR -->
+  <div id="statsBar" class="section-card" style="margin-bottom:16px;">
+    <div class="section-card-body" style="display:flex;gap:32px;flex-wrap:wrap;padding:14px 20px;">
+      <div><span style="font-size:12px;color:var(--gray-600);letter-spacing:0.5px;text-transform:uppercase;">Showing</span> <strong id="statCount" style="font-size:18px;font-family:'Barlow Condensed',sans-serif;color:var(--primary-blue);">0</strong> <span style="font-size:12px;color:var(--gray-600);">records</span></div>
+      <div><span style="font-size:12px;color:var(--gray-600);letter-spacing:0.5px;text-transform:uppercase;">Input</span> <strong id="statInput" style="font-family:'Barlow Condensed',sans-serif;font-size:18px;color:var(--gray-900);">0</strong> <span style="font-size:12px;color:var(--gray-600);">m²</span></div>
+      <div><span style="font-size:12px;color:var(--gray-600);letter-spacing:0.5px;text-transform:uppercase;">Output</span> <strong id="statOutput" style="font-family:'Barlow Condensed',sans-serif;font-size:18px;color:var(--gray-900);">0</strong> <span style="font-size:12px;color:var(--gray-600);">m²</span></div>
+      <div><span style="font-size:12px;color:var(--gray-600);letter-spacing:0.5px;text-transform:uppercase;">Weight</span> <strong id="statWeight" style="font-family:'Barlow Condensed',sans-serif;font-size:18px;color:var(--gray-900);">0</strong> <span style="font-size:12px;color:var(--gray-600);">kg</span></div>
+    </div>
+  </div>
+
+  <!-- DETAIL TABLE -->
+  <div class="section-card">
+    <div class="section-card-header">
+      <span class="section-card-title">Batch Detail Records</span>
+      <button class="btn btn-primary" onclick="exportCSV()" style="font-size:12px;padding:8px 16px;">
+        ↓ Export CSV
+      </button>
+    </div>
+    <div class="section-card-body" style="padding:0;">
+      <div id="detailTableWrap"></div>
+    </div>
+  </div>
+
+  <!-- LOCKED STATE -->
+  <div id="lockedBlock" style="display:none;" class="section-card">
+    <div class="section-card-body">
+      <div class="locked-overlay">
+        <div class="locked-icon">🔒</div>
+        <p>Tiada data untuk bulan ini</p>
+        <small>Sila upload data melalui halaman Upload atau pilih bulan lain.</small>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<style>
+.filter-select {
+  background: var(--white);
+  border: 1px solid var(--gray-300);
+  color: var(--gray-900);
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  font-family: 'Barlow', sans-serif;
+  font-size: 13px;
+  outline: none;
+  min-width: 140px;
+  transition: var(--transition);
+}
+.filter-select:hover {
+  border-color: var(--primary-blue);
+}
+.filter-select:focus {
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 3px var(--primary-blue-light);
+}
+.filter-select option {
+  background: var(--white);
+  color: var(--gray-900);
+}
+
+.sortable {
+  cursor: pointer;
+  user-select: none;
+  color: var(--primary-blue);
+}
+.sortable:hover {
+  opacity: 0.8;
+}
+.sort-asc::after { content: ' ▲'; font-size: 10px; }
+.sort-desc::after { content: ' ▼'; font-size: 10px; }
+</style>
+
+<script src="data.js"></script>
+<script src="shared.js"></script>
+<script>
+let allRecords = [];
+let filteredRecords = [];
+let sortCol = null;
+let sortDir = 1;
+
+function render(monthKey) {
+  const monthData = SBT_DATA.months[monthKey];
+  allRecords = monthData?.records || [];
+  const isLocked = monthData?.locked;
+
+  document.getElementById('pageTitle').textContent =
+    `Film Detail — ${monthData?.label || ''}`;
+
+  const lockedBlock = document.getElementById('lockedBlock');
+  const filterCard = document.getElementById('filterCard');
+  const statsBar = document.getElementById('statsBar');
+
+  if (isLocked || allRecords.length === 0) {
+    lockedBlock.style.display = '';
+    filterCard.style.display = 'none';
+    statsBar.style.display = 'none';
+    document.querySelector('.section-card:last-of-type').style.display = 'none';
+    renderMeta(monthData, []);
+    return;
+  }
+
+  lockedBlock.style.display = 'none';
+  filterCard.style.display = '';
+  statsBar.style.display = '';
+  document.querySelector('.section-card:last-of-type').style.display = '';
+
+  renderMeta(monthData, allRecords);
+  buildFilterOptions(allRecords);
+  applyFilters();
+}
+
+function renderMeta(monthData, records) {
+  const meta = document.getElementById('pageMeta');
+  const tags = [];
+  if (records.length) tags.push(`<span class="meta-tag green">● LIVE DATA</span>`);
+  if (monthData?.source === 'dummy') tags.push(`<span class="meta-tag blue">⚠ DEMO DATA</span>`);
+  tags.push(`<span class="meta-tag blue">${records.length} Batch Records</span>`);
+  meta.innerHTML = tags.join('');
+}
+
+function buildFilterOptions(records) {
+  const customers = ['', ...new Set(records.map(r => r.customer).filter(Boolean))];
+  const colors = ['', ...new Set(records.map(r => r.color).filter(Boolean))];
+  const microns = ['', ...new Set(records.map(r => r.micron).filter(Boolean)).values()].sort();
+
+  fillSelect('filterCustomer', customers, v => v || 'All Customers');
+  fillSelect('filterColor', colors, v => v || 'All Colors');
+  fillSelect('filterMicron', microns, v => v ? v + 'μ' : 'All Micron');
+}
+
+function fillSelect(id, values, labelFn) {
+  const sel = document.getElementById(id);
+  const current = sel.value;
+  sel.innerHTML = values.map(v =>
+    `<option value="${v}"${v === current ? ' selected' : ''}>${labelFn(v)}</option>`
+  ).join('');
+}
+
+function applyFilters() {
+  const customer = document.getElementById('filterCustomer').value;
+  const color = document.getElementById('filterColor').value;
+  const micron = document.getElementById('filterMicron').value;
+  const output = document.getElementById('filterOutput').value;
+  const search = document.getElementById('searchBox').value.toLowerCase().trim();
+
+  filteredRecords = allRecords.filter(r => {
+    if (customer && r.customer !== customer) return false;
+    if (color && r.color !== color) return false;
+    if (micron && String(r.micron) !== String(micron)) return false;
+    if (output === 'done' && r.qtyOutputM2 == null) return false;
+    if (output === 'pending' && r.qtyOutputM2 != null) return false;
+    if (search) {
+      const haystack = [r.batchNumber, r.productionNo, r.itemNumber, r.batchNo, r.lotNumber, r.customer]
+        .join(' ').toLowerCase();
+      if (!haystack.includes(search)) return false;
+    }
+    return true;
+  });
+
+  if (sortCol !== null) sortRecords();
+  updateStatsBar();
+  renderTable();
+}
+
+function updateStatsBar() {
+  const kpis = SBT_DATA.computeKPIs(filteredRecords);
+  document.getElementById('statCount').textContent = filteredRecords.length;
+  document.getElementById('statInput').textContent = fmtM2(kpis.totalQtyInput);
+  document.getElementById('statOutput').textContent = fmtM2(kpis.totalQtyOutput);
+  document.getElementById('statWeight').textContent = fmtNum(kpis.totalWeightKg, 1);
+}
+
+function clearFilters() {
+  document.getElementById('filterCustomer').value = '';
+  document.getElementById('filterColor').value = '';
+  document.getElementById('filterMicron').value = '';
+  document.getElementById('filterOutput').value = '';
+  document.getElementById('searchBox').value = '';
+  applyFilters();
+}
+
+const COLS = [
+  { key: 'micron', label: 'Micron' },
+  { key: 'color', label: 'Color' },
+  { key: 'width', label: 'Width' },
+  { key: 'length', label: 'Length' },
+  { key: 'customer', label: 'Customer' },
+  { key: 'itemNumber', label: 'Item No.' },
+  { key: 'batchNumber', label: 'Batch Number' },
+  { key: 'weightKg', label: 'Weight (kg)' },
+  { key: 'qtyInputM2', label: 'Input (M²)' },
+  { key: 'qtyOutputM2', label: 'Output (M²)' },
+  { key: 'productionNo', label: 'Production No.' },
+  { key: 'configuration', label: 'Config' },
+  { key: 'totalM2', label: 'Total M²' },
+  { key: 'batchNo', label: 'Batch No.' },
+  { key: 'containerNo', label: 'Container' },
+  { key: 'shippingMark', label: 'Shipping Mark' },
+  { key: 'lotNumber', label: 'Lot Number' },
+];
+
+let currentSortKey = null, currentSortDir = 1;
+
+function sortBy(key) {
+  if (currentSortKey === key) currentSortDir *= -1;
+  else { currentSortKey = key; currentSortDir = 1; }
+  sortRecords();
+  renderTable();
+}
+
+function sortRecords() {
+  if (!currentSortKey) return;
+  filteredRecords.sort((a, b) => {
+    const av = a[currentSortKey] ?? '';
+    const bv = b[currentSortKey] ?? '';
+    if (typeof av === 'number') return (av - bv) * currentSortDir;
+    return String(av).localeCompare(String(bv)) * currentSortDir;
+  });
+}
+
+function renderTable() {
+  const wrap = document.getElementById('detailTableWrap');
+  if (!filteredRecords.length) {
+    wrap.innerHTML = `<div class="empty-state" style="padding:40px;"><p>Tiada rekod berpadanan</p><small>Cuba ubah filter.</small></div>`;
+    return;
+  }
+
+  const headerCells = COLS.map(c => {
+    const sortClass = currentSortKey === c.key
+      ? (currentSortDir === 1 ? 'sort-asc' : 'sort-desc')
+      : '';
+    return `<th class="sortable ${sortClass}" onclick="sortBy('${c.key}')">${c.label}</th>`;
+  }).join('');
+
+  const rows = filteredRecords.map(r => {
+    return `<tr>
+      <td class="numeric">${r.micron ?? '—'}μ</td>
+      <td>${colorBadge(r.color)}</td>
+      <td class="numeric">${fmtNum(r.width)}</td>
+      <td class="numeric">${fmtNum(r.length)}</td>
+      <td class="primary">${r.customer || '—'}</td>
+      <td style="font-size:11px;">${r.itemNumber || '—'}</td>
+      <td style="font-size:11px;">${r.batchNumber || '—'}</td>
+      <td class="numeric">${fmtNum(r.weightKg, 1)}</td>
+      <td class="numeric text-green">${fmtNum(r.qtyInputM2, 1)}</td>
+      <td class="numeric">${r.qtyOutputM2 != null ? fmtNum(r.qtyOutputM2, 1) : outputBadge(null)}</td>
+      <td style="font-size:11px;">${r.productionNo || '—'}</td>
+      <td>${r.configuration || '—'}</td>
+      <td class="numeric">${fmtNum(r.totalM2, 0)}</td>
+      <td style="font-size:11px;">${r.batchNo || '—'}</td>
+      <td style="font-size:11px;">${r.containerNo || '—'}</td>
+      <td style="font-size:11px;">${r.shippingMark || '—'}</td>
+      <td style="font-size:11px;">${r.lotNumber || '—'}</td>
+    </tr>`;
+  }).join('');
+
+  wrap.innerHTML = `
+    <div class="data-table-wrap">
+      <table class="data-table">
+        <thead><tr>${headerCells}</tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+}
+
+function exportCSV() {
+  const headers = COLS.map(c => c.label).join(',');
+  const rows = filteredRecords.map(r => [
+    r.micron, r.color, r.width, r.length, r.customer,
+    r.itemNumber, r.batchNumber, r.weightKg, r.qtyInputM2,
+    r.qtyOutputM2 ?? '', r.productionNo, r.configuration,
+    r.totalM2, r.batchNo, r.containerNo, r.shippingMark, r.lotNumber
+  ].map(v => `"${v ?? ''}"`).join(',')).join('\n');
+
+  const blob = new Blob([headers + '\n' + rows], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `SBTape_FilmDetail_${selectedMonth}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  initSelectedMonth();
+  buildMonthFilterBar('monthFilter', (key) => {
+    render(key);
+  });
+  render(selectedMonth);
+});
+</script>
+</body>
+</html>

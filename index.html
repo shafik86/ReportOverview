@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SB Tape Group | Coating Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <a class="topbar-logo" href="index.html">
+    <div class="logo-mark">SB</div>
+    <div class="logo-text">
+      <span class="logo-name">SB TAPE GROUP</span>
+      <span class="logo-sub">Business Intelligence</span>
+    </div>
+  </a>
+  <nav class="topbar-nav">
+    <a class="nav-link active" href="index.html">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </a>
+    <a class="nav-link" href="film-detail.html">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      Detail
+    </a>
+    <a class="nav-link" href="upload.html">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17,8 12,3 7,8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      Upload
+    </a>
+  </nav>
+  <div class="topbar-right">
+    <div class="topbar-badge">COATING & PRINTING <span>MODULE</span></div>
+  </div>
+</header>
+
+<!-- FILTER BAR -->
+<div class="filter-bar">
+  <div class="filter-group">
+    <label class="filter-label">Tahun:</label>
+    <select class="filter-select" id="yearFilter">
+      <option value="2024">2024</option>
+      <option value="2025">2025</option>
+      <option value="2026" selected>2026</option>
+    </select>
+  </div>
+  <div class="filter-group">
+    <label class="filter-label">Bulan:</label>
+    <div class="month-buttons" id="monthFilter"></div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<main class="main-content">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="page-title">Coating Raw Material Dashboard</div>
+      <div class="page-subtitle">Overview & Critical Monitoring</div>
+      <div class="page-meta" id="pageMeta"></div>
+    </div>
+  </div>
+
+  <!-- KPI CARDS -->
+  <div class="kpi-grid" id="kpiGrid"></div>
+
+  <!-- CHARTS -->
+  <div class="charts-grid">
+    <div class="section-card">
+      <div class="section-card-header">
+        <span class="section-card-title">Usage Trend</span>
+      </div>
+      <div class="section-card-body">
+        <canvas id="chartUsageTrend" height="200"></canvas>
+      </div>
+    </div>
+    <div class="section-card">
+      <div class="section-card-header">
+        <span class="section-card-title">Ending Stock Trend</span>
+      </div>
+      <div class="section-card-body">
+        <canvas id="chartStockTrend" height="200"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- CRITICAL ALERTS -->
+  <div class="section-card">
+    <div class="section-card-header">
+      <span class="section-card-title">⚠️ Critical Alert</span>
+      <a class="btn btn-outline" href="film-detail.html" style="font-size:12px;padding:6px 14px;">
+        View Details →
+      </a>
+    </div>
+    <div class="section-card-body" id="criticalAlerts"></div>
+  </div>
+
+  <!-- SUMMARY BOXES -->
+  <div class="grid-3">
+    <div class="section-card">
+      <div class="section-card-header">
+        <span class="section-card-title">Stock Summary</span>
+      </div>
+      <div class="section-card-body">
+        <div id="stockSummary"></div>
+      </div>
+    </div>
+    <div class="section-card">
+      <div class="section-card-header">
+        <span class="section-card-title">Top 5 Usage</span>
+      </div>
+      <div class="section-card-body">
+        <div class="data-table-wrap" id="top5Usage"></div>
+      </div>
+    </div>
+    <div class="section-card">
+      <div class="section-card-header">
+        <span class="section-card-title">Production Line Usage</span>
+      </div>
+      <div class="section-card-body">
+        <canvas id="chartProductionLine" height="200"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOCKED / EMPTY -->
+  <div id="lockedBlock" style="display:none;" class="section-card">
+    <div class="section-card-body">
+      <div class="locked-overlay">
+        <div class="locked-icon">🔒</div>
+        <p>Tiada data untuk bulan ini</p>
+        <small>Sila upload data melalui halaman Upload atau pilih bulan yang tersedia.</small>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script src="data.js"></script>
+<script src="shared.js"></script>
+<script>
+let chartUsageTrend = null, chartStockTrend = null, chartProductionLine = null;
+
+const CHART_COLORS = {
+  blue: '#2563eb',
+  blueSoft: 'rgba(37, 99, 235, 0.7)',
+  green: '#10b981',
+  orange: '#f97316',
+  red: '#ef4444'
+};
+
+const CHART_OPTIONS = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      labels: { color: '#6b7280', font: { family: 'Barlow', size: 12 }, padding: 12 }
+    }
+  },
+  scales: {
+    x: { grid: { color: '#f3f4f6' }, ticks: { color: '#9ca3af', font: { size: 11 } } },
+    y: { grid: { color: '#f3f4f6' }, ticks: { color: '#9ca3af', font: { size: 11 } } }
+  }
+};
+
+function destroyCharts() {
+  if (chartUsageTrend) { chartUsageTrend.destroy(); chartUsageTrend = null; }
+  if (chartStockTrend) { chartStockTrend.destroy(); chartStockTrend = null; }
+  if (chartProductionLine) { chartProductionLine.destroy(); chartProductionLine = null; }
+}
+
+function render(monthKey) {
+  const monthData = SBT_DATA.months[monthKey];
+  const records = monthData?.records || [];
+  const isLocked = monthData?.locked;
+
+  const lockedBlock = document.getElementById('lockedBlock');
+  const kpiGrid = document.getElementById('kpiGrid');
+
+  if (isLocked || records.length === 0) {
+    lockedBlock.style.display = '';
+    kpiGrid.style.display = 'none';
+    document.querySelectorAll('.charts-grid, .section-card:not(#lockedBlock), .grid-3').forEach(el => {
+      if (!el.querySelector('#lockedBlock')) el.style.display = 'none';
+    });
+    destroyCharts();
+    renderMeta(monthData, records);
+    return;
+  }
+
+  lockedBlock.style.display = 'none';
+  kpiGrid.style.display = '';
+  document.querySelectorAll('.charts-grid, .section-card, .grid-3').forEach(el => el.style.display = '');
+
+  const kpis = SBT_DATA.computeKPIs(records);
+  renderMeta(monthData, records);
+  renderKPIs(kpis, records);
+  renderCharts(records, kpis);
+  renderCriticalAlerts(records);
+  renderStockSummary(records, kpis);
+  renderTop5Usage(records);
+  renderProductionLineChart(records);
+}
+
+function renderMeta(monthData, records) {
+  const meta = document.getElementById('pageMeta');
+  const tags = [];
+  if (records.length > 0) {
+    tags.push(`<span class="meta-tag green">● LIVE DATA</span>`);
+  }
+  if (monthData?.source === 'dummy') {
+    tags.push(`<span class="meta-tag blue">⚠ DEMO DATA</span>`);
+  }
+  tags.push(`<span class="meta-tag blue">${records.length} Batch Records</span>`);
+  meta.innerHTML = tags.join('');
+}
+
+function renderKPIs(kpis, records) {
+  const totalUsage = records.reduce((sum, r) => sum + (r.weightKg || 0), 0);
+  const totalProduction = records.reduce((sum, r) => sum + (r.qtyOutputM2 || 0), 0);
+  const totalInput = kpis.totalQtyInput;
+  const wastage = totalInput > 0 ? totalInput - totalProduction : 0;
+  const criticalCount = records.filter(r => (r.qtyOutputM2 == null)).length;
+
+  document.getElementById('kpiGrid').innerHTML = `
+    <div class="kpi-card">
+      <div class="kpi-label">Total Usage</div>
+      <div class="kpi-value">${fmtNum(totalUsage)}<span class="kpi-unit">kg</span></div>
+      <div class="kpi-change positive">+12.4% vs Apr</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Total Production</div>
+      <div class="kpi-value">${fmtM2(totalProduction)}<span class="kpi-unit">m²</span></div>
+      <div class="kpi-change positive">↑ Stable</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Ending Stock</div>
+      <div class="kpi-value">${fmtNum(233230)}<span class="kpi-unit">kg</span></div>
+      <div class="kpi-change negative">⚠ Low</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Wastage</div>
+      <div class="kpi-value">${fmtNum(wastage)}<span class="kpi-unit">kg</span></div>
+      <div class="kpi-change positive">↓ Controlled</div>
+    </div>
+    <div class="kpi-card ${criticalCount > 0 ? 'critical' : ''}">
+      <div class="kpi-label">Critical Items</div>
+      <div class="kpi-value">${criticalCount}</div>
+      <div class="kpi-change negative">Items</div>
+    </div>
+  `;
+}
+
+function renderCharts(records, kpis) {
+  destroyCharts();
+
+  // Usage Trend Bar Chart
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May'];
+  const usageData = [450000, 520000, 480000, 510000, 650000];
+
+  const ctxUsage = document.getElementById('chartUsageTrend').getContext('2d');
+  chartUsageTrend = new Chart(ctxUsage, {
+    type: 'bar',
+    data: {
+      labels: months,
+      datasets: [{
+        label: 'Usage (kg)',
+        data: usageData,
+        backgroundColor: CHART_COLORS.blueSoft,
+        borderColor: CHART_COLORS.blue,
+        borderWidth: 1,
+        borderRadius: 4
+      }]
+    },
+    options: CHART_OPTIONS
+  });
+
+  // Stock Trend Line Chart
+  const stockData = [450000, 420000, 390000, 350000, 280000];
+
+  const ctxStock = document.getElementById('chartStockTrend').getContext('2d');
+  chartStockTrend = new Chart(ctxStock, {
+    type: 'line',
+    data: {
+      labels: months,
+      datasets: [{
+        label: 'Ending Stock (kg)',
+        data: stockData,
+        borderColor: CHART_COLORS.orange,
+        backgroundColor: 'rgba(249, 115, 22, 0.1)',
+        borderWidth: 2,
+        fill: true,
+        tension: 0.4
+      }]
+    },
+    options: CHART_OPTIONS
+  });
+}
+
+function renderCriticalAlerts(records) {
+  const criticalItems = records
+    .filter(r => r.qtyOutputM2 == null || (r.weightKg || 0) < 500)
+    .slice(0, 5);
+
+  if (!criticalItems.length) {
+    document.getElementById('criticalAlerts').innerHTML = `
+      <div class="empty-state">
+        <p>✓ No critical items</p>
+      </div>`;
+    return;
+  }
+
+  const rows = criticalItems.map(r => {
+    const status = r.qtyOutputM2 == null ? 'PENDING' : 'LOW STOCK';
+    const statusClass = r.qtyOutputM2 == null ? 'badge-warning' : 'badge-critical';
+    return `
+      <tr>
+        <td class="primary">${r.itemNumber?.slice(0, 12) || 'N/A'}</td>
+        <td class="primary">${r.customer || 'N/A'}</td>
+        <td class="numeric">${fmtNum(r.weightKg || 0)}</td>
+        <td><span class="badge ${statusClass}">${status}</span></td>
+      </tr>`;
+  }).join('');
+
+  document.getElementById('criticalAlerts').innerHTML = `
+    <div class="data-table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Film Code</th>
+            <th>Customer</th>
+            <th>Stock (kg)</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+}
+
+function renderStockSummary(records, kpis) {
+  const totalUsage = records.reduce((sum, r) => sum + (r.weightKg || 0), 0);
+
+  document.getElementById('stockSummary').innerHTML = `
+    <div class="summary-box">
+      <div class="summary-row">
+        <span class="label">Opening Stock</span>
+        <span class="value">${fmtNum(950000)}</span>
+      </div>
+      <div class="summary-row">
+        <span class="label">Total Received</span>
+        <span class="value">${fmtNum(500000)}</span>
+      </div>
+      <div class="summary-row">
+        <span class="label">Total Usage</span>
+        <span class="value">${fmtNum(totalUsage)}</span>
+      </div>
+      <div class="summary-row">
+        <span class="label">Ending Stock</span>
+        <span class="value">${fmtNum(233230)}</span>
+      </div>
+    </div>`;
+}
+
+function renderTop5Usage(records) {
+  const byCustomer = {};
+  records.forEach(r => {
+    const key = r.customer || 'N/A';
+    if (!byCustomer[key]) byCustomer[key] = 0;
+    byCustomer[key] += r.weightKg || 0;
+  });
+
+  const top5 = Object.entries(byCustomer)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5);
+
+  const rows = top5.map(([cust, usage]) => `
+    <tr>
+      <td class="primary">${cust}</td>
+      <td class="numeric">${fmtNum(usage)}</td>
+    </tr>`).join('');
+
+  document.getElementById('top5Usage').innerHTML = `
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Film Name</th>
+          <th>Usage (kg)</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
+function renderProductionLineChart(records) {
+  const byColor = {};
+  records.forEach(r => {
+    const key = r.color || 'unknown';
+    if (!byColor[key]) byColor[key] = 0;
+    byColor[key] += r.qtyOutputM2 || 0;
+  });
+
+  const labels = Object.keys(byColor);
+  const data = Object.values(byColor);
+  const colors = ['#2563eb', '#10b981', '#f97316', '#ef4444', '#8b5cf6'];
+
+  const ctxProd = document.getElementById('chartProductionLine').getContext('2d');
+  chartProductionLine = new Chart(ctxProd, {
+    type: 'doughnut',
+    data: {
+      labels: labels,
+      datasets: [{
+        data: data,
+        backgroundColor: colors,
+        borderColor: '#ffffff',
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { color: '#6b7280', font: { family: 'Barlow', size: 11 }, padding: 12 }
+        }
+      }
+    }
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  initSelectedMonth();
+  buildMonthFilterBar('monthFilter', (key) => {
+    render(key);
+  });
+  render(selectedMonth);
+});
+</script>
+</body>
+</html>

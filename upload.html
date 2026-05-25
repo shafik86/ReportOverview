@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SB Tape Group | Upload Data</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <a class="topbar-logo" href="index.html">
+    <div class="logo-mark">SB</div>
+    <div class="logo-text">
+      <span class="logo-name">SB TAPE GROUP</span>
+      <span class="logo-sub">Business Intelligence</span>
+    </div>
+  </a>
+  <nav class="topbar-nav">
+    <a class="nav-link" href="index.html">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </a>
+    <a class="nav-link" href="film-detail.html">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      Detail
+    </a>
+    <a class="nav-link active" href="upload.html">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17,8 12,3 7,8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      Upload
+    </a>
+  </nav>
+  <div class="topbar-right">
+    <div class="topbar-badge">COATING & PRINTING <span>MODULE</span></div>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main class="main-content">
+
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="page-title">Upload Data</div>
+      <div class="page-subtitle">Upload Excel atau ODS file untuk semak preview data sebelum import</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+
+    <!-- UPLOAD CARD -->
+    <div class="section-card">
+      <div class="section-card-header">
+        <span class="section-card-title">📤 Upload File</span>
+      </div>
+      <div class="section-card-body">
+
+        <!-- Month selector -->
+        <div style="margin-bottom:20px;">
+          <label class="filter-label" style="display:block;margin-bottom:8px;">Target Bulan</label>
+          <select id="uploadMonth" class="filter-select" style="width:100%;min-width:auto;">
+            <option value="2026-05">May 2026 (Current)</option>
+            <option value="2026-04">April 2026</option>
+            <option value="2026-06">June 2026</option>
+          </select>
+        </div>
+
+        <!-- Drop zone -->
+        <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17,8 12,3 7,8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          <p>Drag & drop atau klik untuk pilih file</p>
+          <small>Sokong: .xlsx, .xls, .ods, .csv</small>
+        </div>
+        <input type="file" id="fileInput" accept=".xlsx,.xls,.ods,.csv" style="display:none;">
+
+        <!-- Upload status -->
+        <div id="uploadStatus" style="margin-top:16px;display:none;">
+          <div style="display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:8px;border:1px solid var(--gray-200);background:var(--gray-50);">
+            <span id="statusIcon" style="font-size:20px;">📄</span>
+            <div>
+              <div id="fileName" style="font-size:13px;font-weight:600;color:var(--gray-900);"></div>
+              <div id="fileInfo" style="font-size:11px;color:var(--gray-600);margin-top:2px;"></div>
+            </div>
+            <button onclick="clearUpload()" style="margin-left:auto;background:none;border:none;color:var(--gray-400);cursor:pointer;font-size:18px;line-height:1;">×</button>
+          </div>
+        </div>
+
+        <div style="margin-top:16px;display:flex;gap:10px;">
+          <button class="btn btn-primary" onclick="processUpload()" id="btnProcess" disabled style="flex:1;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20,6 9,17 4,12"/></svg>
+            Preview Data
+          </button>
+        </div>
+
+        <div id="uploadMsg" style="margin-top:12px;font-size:12px;display:none;padding:8px 12px;border-radius:6px;"></div>
+      </div>
+    </div>
+
+    <!-- DOWNLOAD TEMPLATE CARD -->
+    <div class="section-card">
+      <div class="section-card-header">
+        <span class="section-card-title">📥 Download Format</span>
+      </div>
+      <div class="section-card-body">
+        <p style="color:var(--gray-600);font-size:13px;margin-bottom:16px;line-height:1.6;">
+          Download template Excel yang sesuai dengan format sistem. Pastikan data diisi mengikut format yang betul supaya upload berjaya.
+        </p>
+
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px;">
+          <button class="btn btn-primary" onclick="downloadTemplate('xlsx')" style="justify-content:center;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download Template (.xlsx)
+          </button>
+          <button class="btn btn-secondary" onclick="downloadTemplate('csv')" style="justify-content:center;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download Template (.csv)
+          </button>
+        </div>
+
+        <div style="font-size:12px;color:var(--gray-700);font-weight:600;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:10px;">Kolum Diperlukan</div>
+        <div style="max-height:300px;overflow-y:auto;">
+          <table style="font-size:12px;width:100%;border-collapse:collapse;">
+            <thead>
+              <tr style="background:var(--gray-50);">
+                <th style="padding:8px;text-align:left;color:var(--gray-700);font-weight:600;border-bottom:1px solid var(--gray-200);">#</th>
+                <th style="padding:8px;text-align:left;color:var(--gray-700);font-weight:600;border-bottom:1px solid var(--gray-200);">Column Name</th>
+                <th style="padding:8px;text-align:left;color:var(--gray-700);font-weight:600;border-bottom:1px solid var(--gray-200);">Type</th>
+                <th style="padding:8px;text-align:left;color:var(--gray-700);font-weight:600;border-bottom:1px solid var(--gray-200);">Contoh</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom:1px solid var(--gray-200);"><td style="padding:8px;color:var(--gray-600);">1</td><td>MICRON</td><td>Number</td><td>24</td></tr>
+              <tr style="border-bottom:1px solid var(--gray-200);"><td style="padding:8px;color:var(--gray-600);">2</td><td>COLOR</td><td>Text</td><td>clear</td></tr>
+              <tr style="border-bottom:1px solid var(--gray-200);"><td style="padding:8px;color:var(--gray-600);">3</td><td>WIDTH</td><td>Number</td><td>1610</td></tr>
+              <tr style="border-bottom:1px solid var(--gray-200);"><td style="padding:8px;color:var(--gray-600);">4</td><td>LENGTH</td><td>Number</td><td>14600</td></tr>
+              <tr style="border-bottom:1px solid var(--gray-200);"><td style="padding:8px;color:var(--gray-600);">5</td><td>CUSTOMER NAME</td><td>Text</td><td>SHURTAPE</td></tr>
+              <tr style="border-bottom:1px solid var(--gray-200);"><td style="padding:8px;color:var(--gray-600);">6</td><td>ITEM NUMBER</td><td>Text</td><td>ZPBOPP24C161014</td></tr>
+              <tr style="border-bottom:1px solid var(--gray-200);"><td style="padding:8px;color:var(--gray-600);">7</td><td>BATCH NUMBER</td><td>Text</td><td>ST2026040202-010</td></tr>
+              <tr style="border-bottom:1px solid var(--gray-200);"><td style="padding:8px;color:var(--gray-600);">8</td><td>WEIGHT KG</td><td>Number</td><td>510</td></tr>
+              <tr style="border-bottom:1px solid var(--gray-200);"><td style="padding:8px;color:var(--gray-600);">9</td><td>QTY INPUT M2</td><td>Number</td><td>23500</td></tr>
+              <tr style="border-bottom:1px solid var(--gray-200);"><td style="padding:8px;color:var(--gray-600);">10</td><td>QTY OUTPUT M2</td><td>Number</td><td>7600</td></tr>
+              <tr style="border-bottom:1px solid var(--gray-200);"><td style="padding:8px;color:var(--gray-600);">11</td><td>PRODUCTION NO</td><td>Text</td><td>ST19-000168250</td></tr>
+              <tr style="border-bottom:1px solid var(--gray-200);"><td style="padding:8px;color:var(--gray-600);">12</td><td>CONFIGURATION</td><td>Text</td><td>1595X4860</td></tr>
+              <tr style="border-bottom:1px solid var(--gray-200);"><td style="padding:8px;color:var(--gray-600);">13</td><td>TOTAL M2</td><td>Number</td><td>498000</td></tr>
+              <tr style="border-bottom:1px solid var(--gray-200);"><td style="padding:8px;color:var(--gray-600);">14</td><td>BATCH NO</td><td>Text</td><td>STPD0027720</td></tr>
+              <tr style="border-bottom:1px solid var(--gray-200);"><td style="padding:8px;color:var(--gray-600);">15</td><td>CONTAINER NO</td><td>Text</td><td>FOROP ADVANCED</td></tr>
+              <tr style="border-bottom:1px solid var(--gray-200);"><td style="padding:8px;color:var(--gray-600);">16</td><td>SHIPPING MARK</td><td>Text</td><td>F10543-2604020001</td></tr>
+              <tr><td style="padding:8px;color:var(--gray-600);">17</td><td>LOT NUMBER</td><td>Text</td><td>MSDU4411880</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- PREVIEW TABLE -->
+  <div class="section-card" id="previewCard" style="display:none;">
+    <div class="section-card-header">
+      <span class="section-card-title" id="previewTitle">Preview — Data yang Diupload</span>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-secondary" onclick="hidePreview()" style="font-size:12px;padding:8px 16px;">Batal</button>
+        <button class="btn btn-primary" onclick="confirmImport()" style="font-size:12px;padding:8px 16px;">
+          ✓ Confirm Import
+        </button>
+      </div>
+    </div>
+    <div style="padding:12px 20px;background:var(--red-light);border-bottom:1px solid var(--gray-200);">
+      <div style="font-size:12px;color:var(--red-critical);">
+        ⚠ Preview sahaja — data tidak akan disimpan secara kekal dalam sesi ini (demo mode). Dalam production, data akan di-save ke database.
+      </div>
+    </div>
+    <div class="section-card-body" style="padding:0;">
+      <div id="previewTableWrap"></div>
+    </div>
+  </div>
+
+</main>
+
+<script src="data.js"></script>
+<script src="shared.js"></script>
+<script>
+let uploadedData = [];
+let uploadedFile = null;
+
+// Drag & drop
+const dropZone = document.getElementById('dropZone');
+
+dropZone.addEventListener('dragover', e => {
+  e.preventDefault();
+  dropZone.classList.add('dragover');
+});
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (file) handleFile(file);
+});
+
+// File input change
+document.getElementById('fileInput').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (file) handleFile(file);
+});
+
+function handleFile(file) {
+  uploadedFile = file;
+  const reader = new FileReader();
+  reader.onload = () => {
+    const data = new Uint8Array(reader.result);
+    const workbook = XLSX.read(data, { type: 'array' });
+    const sheetName = workbook.SheetNames[0];
+    const sheet = workbook.Sheets[sheetName];
+    uploadedData = XLSX.utils.sheet_to_json(sheet);
+
+    document.getElementById('uploadStatus').style.display = '';
+    document.getElementById('fileName').textContent = file.name;
+    document.getElementById('fileInfo').textContent = `${uploadedData.length} rows`;
+    document.getElementById('btnProcess').disabled = false;
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function clearUpload() {
+  uploadedFile = null;
+  uploadedData = [];
+  document.getElementById('fileInput').value = '';
+  document.getElementById('uploadStatus').style.display = 'none';
+  document.getElementById('btnProcess').disabled = true;
+}
+
+function processUpload() {
+  if (uploadedData.length === 0) {
+    alert('Tiada data');
+    return;
+  }
+
+  const previewRows = uploadedData.slice(0, 10).map(r => `
+    <tr>
+      <td>${r.MICRON || '—'}</td>
+      <td>${r.COLOR || '—'}</td>
+      <td>${r['CUSTOMER NAME'] || '—'}</td>
+      <td class="numeric">${r['WEIGHT KG'] || '—'}</td>
+      <td class="numeric">${r['QTY INPUT M2'] || '—'}</td>
+    </tr>`).join('');
+
+  document.getElementById('previewTableWrap').innerHTML = `
+    <div class="data-table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Micron</th>
+            <th>Color</th>
+            <th>Customer</th>
+            <th>Weight (kg)</th>
+            <th>Input (M²)</th>
+          </tr>
+        </thead>
+        <tbody>${previewRows}</tbody>
+      </table>
+    </div>`;
+
+  document.getElementById('previewCard').style.display = '';
+  document.getElementById('previewTitle').textContent = `Preview — ${uploadedData.length} records`;
+}
+
+function hidePreview() {
+  document.getElementById('previewCard').style.display = 'none';
+}
+
+function confirmImport() {
+  const month = document.getElementById('uploadMonth').value;
+  alert(`Import confirmed untuk ${month}.\nDemo mode: data tidak disimpan.\nDalam production, ${uploadedData.length} records akan di-save.`);
+  clearUpload();
+  hidePreview();
+}
+
+function downloadTemplate(format) {
+  const headers = ['MICRON', 'COLOR', 'WIDTH', 'LENGTH', 'CUSTOMER NAME', 'ITEM NUMBER',
+                  'BATCH NUMBER', 'WEIGHT KG', 'QTY INPUT M2', 'QTY OUTPUT M2', 'PRODUCTION NO',
+                  'CONFIGURATION', 'TOTAL M2', 'BATCH NO', 'CONTAINER NO', 'SHIPPING MARK', 'LOT NUMBER'];
+
+  if (format === 'xlsx') {
+    const ws = XLSX.utils.aoa_to_sheet([headers]);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Template');
+    XLSX.writeFile(wb, 'SBTape_Template.xlsx');
+  } else {
+    const csv = headers.join(',') + '\n';
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'SBTape_Template.csv';
+    a.click();
+  }
+}
+</script>
+</body>
+</html>
