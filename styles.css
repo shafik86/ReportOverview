@@ -19,6 +19,7 @@
   --gray-400: #9ca3af;
   --gray-500: #6b7280;
   --gray-600: #4b5563;
+  --gray-650: #3f4d5f;
   --gray-700: #374151;
   --gray-800: #1f2937;
   --gray-900: #111827;
@@ -45,10 +46,13 @@ body {
   font-family: 'Barlow', sans-serif;
   background: var(--bg-light);
   color: var(--gray-900);
-  min-height: 100vh;
+  width: 100vw;
+  height: 100vh;
   font-size: 14px;
   line-height: 1.6;
-  overflow-x: hidden;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 /* ─── TOPBAR ─────────────────────────────── */
@@ -171,15 +175,77 @@ body {
   font-weight: 600;
 }
 
+/* ─── APP CONTAINER ──────────────────────── */
+.app-container {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ─── SIDEBAR ─────────────────────────────── */
+.sidebar {
+  width: 220px;
+  background: var(--gray-900);
+  color: var(--white);
+  padding: 20px 0;
+  border-right: 1px solid var(--gray-800);
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+
+.sidebar-title {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--gray-400);
+  padding: 0 16px;
+  margin-bottom: 16px;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  color: var(--gray-300);
+  text-decoration: none;
+  font-size: 13px;
+  transition: var(--transition);
+  border-left: 3px solid transparent;
+}
+
+.sidebar-link:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--white);
+}
+
+.sidebar-link.active {
+  background: rgba(37, 99, 235, 0.15);
+  color: var(--primary-blue);
+  border-left-color: var(--primary-blue);
+}
+
+.sidebar-link svg {
+  flex-shrink: 0;
+}
+
 /* ─── FILTER BAR ──────────────────────────── */
 .filter-bar {
-  background: var(--white);
-  border-bottom: 1px solid var(--gray-200);
-  padding: 16px 24px;
+  background: var(--gray-800);
+  border-bottom: 1px solid var(--gray-700);
+  padding: 14px 24px;
   display: flex;
   align-items: center;
   gap: 24px;
   flex-wrap: wrap;
+  flex-shrink: 0;
 }
 
 .filter-group {
@@ -189,20 +255,20 @@ body {
 }
 
 .filter-label {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--gray-700);
-  letter-spacing: 0.5px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--gray-300);
+  letter-spacing: 1px;
   text-transform: uppercase;
   white-space: nowrap;
 }
 
 .filter-select {
   padding: 8px 12px;
-  border: 1px solid var(--gray-300);
+  border: 1px solid var(--gray-600);
   border-radius: var(--radius-sm);
-  background: var(--white);
-  color: var(--gray-900);
+  background: var(--gray-700);
+  color: var(--white);
   font-family: 'Barlow', sans-serif;
   font-size: 13px;
   cursor: pointer;
@@ -211,41 +277,49 @@ body {
 
 .filter-select:hover {
   border-color: var(--primary-blue);
+  background: var(--gray-650);
 }
 
 .filter-select:focus {
   outline: none;
   border-color: var(--primary-blue);
-  box-shadow: 0 0 0 3px var(--primary-blue-light);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
 }
 
-.month-buttons {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
+.filter-select option {
+  background: var(--gray-800);
+  color: var(--white);
+}
+
+.month-buttons-container {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 8px;
+  width: 100%;
 }
 
 .month-btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 4px;
-  padding: 6px 12px;
-  border-radius: 20px;
-  border: 1px solid var(--gray-300);
-  background: transparent;
-  color: var(--gray-600);
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--gray-600);
+  background: var(--gray-700);
+  color: var(--gray-300);
   font-family: 'Barlow', sans-serif;
   font-size: 12px;
   font-weight: 500;
-  cursor: pointer;
+  cursor: not-allowed;
   transition: var(--transition);
   white-space: nowrap;
 }
 
 .month-btn:hover:not(:disabled) {
   border-color: var(--primary-blue);
-  color: var(--primary-blue);
-  background: var(--primary-blue-light);
+  color: var(--white);
+  background: var(--gray-600);
 }
 
 .month-btn.active {
@@ -253,6 +327,11 @@ body {
   border-color: var(--primary-blue);
   color: var(--white);
   font-weight: 600;
+  cursor: pointer;
+}
+
+.month-btn:not(.locked):not(:disabled) {
+  cursor: pointer;
 }
 
 .month-btn .dot {
@@ -270,8 +349,11 @@ body {
 
 /* ─── MAIN CONTENT ───────────────────────── */
 .main-content {
+  flex: 1;
+  overflow-y: auto;
   padding: 24px;
-  max-width: 1400px;
+  width: 100%;
+  max-width: 1920px;
   margin: 0 auto;
 }
 

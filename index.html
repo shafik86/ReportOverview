@@ -37,108 +37,132 @@
   </div>
 </header>
 
-<!-- FILTER BAR -->
-<div class="filter-bar">
-  <div class="filter-group">
-    <label class="filter-label">Tahun:</label>
-    <select class="filter-select" id="yearFilter">
-      <option value="2024">2024</option>
-      <option value="2025">2025</option>
-      <option value="2026" selected>2026</option>
-    </select>
-  </div>
-  <div class="filter-group">
-    <label class="filter-label">Bulan:</label>
-    <div class="month-buttons" id="monthFilter"></div>
-  </div>
-</div>
+<div class="app-container">
 
-<!-- MAIN -->
-<main class="main-content">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-title">Reports</div>
 
-  <!-- PAGE HEADER -->
-  <div class="page-header">
-    <div class="page-header-left">
-      <div class="page-title">Coating Raw Material Dashboard</div>
-      <div class="page-subtitle">Overview & Critical Monitoring</div>
-      <div class="page-meta" id="pageMeta"></div>
-    </div>
-  </div>
-
-  <!-- KPI CARDS -->
-  <div class="kpi-grid" id="kpiGrid"></div>
-
-  <!-- CHARTS -->
-  <div class="charts-grid">
-    <div class="section-card">
-      <div class="section-card-header">
-        <span class="section-card-title">Usage Trend</span>
-      </div>
-      <div class="section-card-body">
-        <canvas id="chartUsageTrend" height="200"></canvas>
-      </div>
-    </div>
-    <div class="section-card">
-      <div class="section-card-header">
-        <span class="section-card-title">Ending Stock Trend</span>
-      </div>
-      <div class="section-card-body">
-        <canvas id="chartStockTrend" height="200"></canvas>
-      </div>
-    </div>
-  </div>
-
-  <!-- CRITICAL ALERTS -->
-  <div class="section-card">
-    <div class="section-card-header">
-      <span class="section-card-title">⚠️ Critical Alert</span>
-      <a class="btn btn-outline" href="film-detail.html" style="font-size:12px;padding:6px 14px;">
-        View Details →
+    <nav class="sidebar-nav">
+      <a href="#" class="sidebar-link active">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 3h18v18H3z"/><path d="M3 12h18M12 3v18"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+        <span>Coating Raw Material</span>
       </a>
-    </div>
-    <div class="section-card-body" id="criticalAlerts"></div>
-  </div>
+      <a href="#" class="sidebar-link">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 3h18v18H3z"/><path d="M3 12h18M12 3v18"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+        <span>Printing Report</span>
+      </a>
+    </nav>
+  </aside>
 
-  <!-- SUMMARY BOXES -->
-  <div class="grid-3">
-    <div class="section-card">
-      <div class="section-card-header">
-        <span class="section-card-title">Stock Summary</span>
-      </div>
-      <div class="section-card-body">
-        <div id="stockSummary"></div>
-      </div>
+  <!-- FILTER BAR -->
+  <div class="filter-bar">
+    <div class="filter-group" style="flex-shrink: 0;">
+      <label class="filter-label">Tahun:</label>
+      <select class="filter-select" id="yearFilter">
+        <option value="2024">2024</option>
+        <option value="2025">2025</option>
+        <option value="2026" selected>2026</option>
+      </select>
     </div>
-    <div class="section-card">
-      <div class="section-card-header">
-        <span class="section-card-title">Top 5 Usage</span>
-      </div>
-      <div class="section-card-body">
-        <div class="data-table-wrap" id="top5Usage"></div>
-      </div>
-    </div>
-    <div class="section-card">
-      <div class="section-card-header">
-        <span class="section-card-title">Production Line Usage</span>
-      </div>
-      <div class="section-card-body">
-        <canvas id="chartProductionLine" height="200"></canvas>
-      </div>
+    <div class="filter-group" style="flex: 1;">
+      <label class="filter-label">Bulan:</label>
+      <div class="month-buttons-container" id="monthFilter"></div>
     </div>
   </div>
 
-  <!-- LOCKED / EMPTY -->
-  <div id="lockedBlock" style="display:none;" class="section-card">
-    <div class="section-card-body">
-      <div class="locked-overlay">
-        <div class="locked-icon">🔒</div>
-        <p>Tiada data untuk bulan ini</p>
-        <small>Sila upload data melalui halaman Upload atau pilih bulan yang tersedia.</small>
+  <!-- MAIN -->
+  <main class="main-content">
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+      <div class="page-header-left">
+        <div class="page-title">Coating Raw Material Dashboard</div>
+        <div class="page-subtitle">Overview & Critical Monitoring</div>
+        <div class="page-meta" id="pageMeta"></div>
       </div>
     </div>
-  </div>
 
-</main>
+    <!-- KPI CARDS -->
+    <div class="kpi-grid" id="kpiGrid"></div>
+
+    <!-- CHARTS -->
+    <div class="charts-grid">
+      <div class="section-card">
+        <div class="section-card-header">
+          <span class="section-card-title">Usage Trend</span>
+        </div>
+        <div class="section-card-body">
+          <canvas id="chartUsageTrend" height="200"></canvas>
+        </div>
+      </div>
+      <div class="section-card">
+        <div class="section-card-header">
+          <span class="section-card-title">Ending Stock Trend</span>
+        </div>
+        <div class="section-card-body">
+          <canvas id="chartStockTrend" height="200"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- CRITICAL ALERTS -->
+    <div class="section-card">
+      <div class="section-card-header">
+        <span class="section-card-title">⚠️ Critical Alert</span>
+        <a class="btn btn-outline" href="film-detail.html" style="font-size:12px;padding:6px 14px;">
+          View Details →
+        </a>
+      </div>
+      <div class="section-card-body" id="criticalAlerts"></div>
+    </div>
+
+    <!-- SUMMARY BOXES -->
+    <div class="grid-3">
+      <div class="section-card">
+        <div class="section-card-header">
+          <span class="section-card-title">Stock Summary</span>
+        </div>
+        <div class="section-card-body">
+          <div id="stockSummary"></div>
+        </div>
+      </div>
+      <div class="section-card">
+        <div class="section-card-header">
+          <span class="section-card-title">Top 5 Usage</span>
+        </div>
+        <div class="section-card-body">
+          <div class="data-table-wrap" id="top5Usage"></div>
+        </div>
+      </div>
+      <div class="section-card">
+        <div class="section-card-header">
+          <span class="section-card-title">Production Line Usage</span>
+        </div>
+        <div class="section-card-body">
+          <canvas id="chartProductionLine" height="200"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- LOCKED / EMPTY -->
+    <div id="lockedBlock" style="display:none;" class="section-card">
+      <div class="section-card-body">
+        <div class="locked-overlay">
+          <div class="locked-icon">🔒</div>
+          <p>Tiada data untuk bulan ini</p>
+          <small>Sila upload data melalui halaman Upload atau pilih bulan yang tersedia.</small>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+</div>
 
 <script src="data.js"></script>
 <script src="shared.js"></script>
@@ -258,7 +282,6 @@ function renderKPIs(kpis, records) {
 function renderCharts(records, kpis) {
   destroyCharts();
 
-  // Usage Trend Bar Chart
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May'];
   const usageData = [450000, 520000, 480000, 510000, 650000];
 
@@ -279,7 +302,6 @@ function renderCharts(records, kpis) {
     options: CHART_OPTIONS
   });
 
-  // Stock Trend Line Chart
   const stockData = [450000, 420000, 390000, 350000, 280000];
 
   const ctxStock = document.getElementById('chartStockTrend').getContext('2d');

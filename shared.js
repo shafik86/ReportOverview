@@ -16,34 +16,41 @@ function initSelectedMonth() {
   }
 }
 
-// ── Build Month Filter Bar ──────────────────────────────────
+// ── Build Month Filter Bar with 12 months ──────────────────
 function buildMonthFilterBar(containerId, onSelect) {
   const container = document.getElementById(containerId);
   if (!container) return;
 
-  container.innerHTML = `<span class="filter-label">Filter Bulan</span>`;
+  // Create 12 months (Jan-Dec 2026)
+  const monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const monthKeys = [
+    '2026-01', '2026-02', '2026-03', '2026-04', '2026-05', '2026-06',
+    '2026-07', '2026-08', '2026-09', '2026-10', '2026-11', '2026-12'
+  ];
 
-  MONTHS_ORDER.forEach(key => {
-    const m = SBT_DATA.months[key];
-    const hasData = m.records.length > 0;
-    const isLocked = m.locked;
+  // Only 3 latest months are enabled (May, April, March)
+  const enabledMonths = ['2026-05', '2026-04', '2026-03'];
+
+  monthKeys.forEach((key, index) => {
+    const m = SBT_DATA.months[key] || { label: monthLabels[index], locked: true, records: [], source: 'empty' };
+    const isEnabled = enabledMonths.includes(key);
+    const hasData = m.records && m.records.length > 0;
     const isActive = key === selectedMonth;
     const isDummy = m.source === 'dummy';
 
     const btn = document.createElement('button');
-    btn.className = `month-btn${isActive ? ' active' : ''}${hasData ? ' has-data' : ''}${isLocked ? ' locked' : ''}`;
-    btn.disabled = isLocked;
+    btn.className = `month-btn${isActive ? ' active' : ''}${hasData ? ' has-data' : ''}${!isEnabled ? ' locked' : ''}`;
+    btn.disabled = !isEnabled;
+    btn.textContent = monthLabels[index];
 
-    let inner = '';
-    if (hasData) inner += `<span class="dot"></span>`;
-    inner += `<span>${m.label}</span>`;
-    if (isDummy && hasData) inner += `<span class="badge-dummy">DEMO</span>`;
+    if (hasData) {
+      btn.innerHTML = `<span class="dot"></span>${monthLabels[index]}`;
+    }
 
-    btn.innerHTML = inner;
-    btn.title = isLocked ? 'Tiada data untuk bulan ini' : m.label;
+    btn.title = !isEnabled ? 'Tiada data' : m.label;
 
     btn.addEventListener('click', () => {
-      if (isLocked) return;
+      if (!isEnabled) return;
       selectedMonth = key;
       // Update all buttons
       container.querySelectorAll('.month-btn').forEach(b => b.classList.remove('active'));
